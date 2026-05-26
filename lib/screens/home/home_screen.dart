@@ -6,11 +6,12 @@ import '../../widgets/empty_state_widget.dart';
 import '../../widgets/loading_widget.dart';
 import '../../core/routes/app_routes.dart';
 
-// Import tab screens
+// Sub-screens for each tab in bottom navigation
 import '../profile/profile_screen.dart';
 import '../notifications/notification_screen.dart';
 import '../settings/settings_screen.dart';
 
+// Main screen shell containing the bottom navigation bar and the appbar
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -21,7 +22,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  // List of screens to toggle from bottom navigation
+  // These are the main tabs inside our navigation bar
   final List<Widget> _tabs = [
     const FeedTab(),
     const NotificationScreen(),
@@ -46,13 +47,13 @@ class _HomeScreenState extends State<HomeScreen> {
           _titles[_currentIndex],
           style: theme.appBarTheme.titleTextStyle,
         ),
-        actions: _currentIndex == 2 // Show logout/edit on profile tab
+        actions: _currentIndex == 2 // Show shortcut to settings only when viewing profile tab
             ? [
                 IconButton(
                   icon: const Icon(Icons.settings_outlined),
                   onPressed: () {
                     setState(() {
-                      _currentIndex = 3; // Switch to settings
+                      _currentIndex = 3; // Switch to settings tab
                     });
                   },
                 ),
@@ -108,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-/// Dynamic Post Feed widget used as the default Home Screen Tab
+// The home feed tab that displays all student posts in real-time
 class FeedTab extends StatelessWidget {
   const FeedTab({Key? key}) : super(key: key);
 
@@ -134,11 +135,11 @@ class FeedTab extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: () async {
-        // Real-time listener updates automatically, but we can delay to show feedback
+        // We use real-time listeners, but this dummy delay gives standard pull-to-refresh feel
         await Future.delayed(const Duration(milliseconds: 800));
       },
       child: ListView.builder(
-        padding: const EdgeInsets.only(bottom: 84), // Avoid floating button overlap
+        padding: const EdgeInsets.only(bottom: 84), // Extra bottom padding so the fab doesn't block the last post
         itemCount: postProvider.posts.length,
         itemBuilder: (context, index) {
           final post = postProvider.posts[index];

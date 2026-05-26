@@ -7,6 +7,7 @@ import '../../core/utils/validators.dart';
 import '../../core/utils/helpers.dart';
 import '../../core/routes/app_routes.dart';
 
+// Screen for new students to register an account
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
 
@@ -15,6 +16,7 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  // Global key for form validation, plus controllers for name, email and password
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -28,6 +30,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  // Handle signup. If successful, automatically log in and clear the navigation stack to home.
   Future<void> _handleRegister() async {
     if (_formKey.currentState!.validate()) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -39,6 +42,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
         if (mounted) {
           Helpers.showSnackBar(context, 'Account created successfully!');
+          // Navigate to Home screen and pop all auth screens from history
           Navigator.pushNamedAndRemoveUntil(
             context,
             AppRoutes.home,
@@ -94,7 +98,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // Fields
+                // Name, Email, and Password registration fields
                 CustomTextField(
                   controller: _nameController,
                   hintText: 'Enter your full name',
@@ -125,7 +129,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // Register CTA Button
+                // Submit button for registration
                 CustomButton(
                   text: 'Sign Up',
                   onPressed: _handleRegister,
@@ -133,7 +137,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // Login Link
+                // Takes user back to the sign in page
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
