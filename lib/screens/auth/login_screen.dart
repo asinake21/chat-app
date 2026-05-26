@@ -7,6 +7,7 @@ import '../../core/utils/validators.dart';
 import '../../core/utils/helpers.dart';
 import '../../core/routes/app_routes.dart';
 
+// Screen where users can log in using their student email and password
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
@@ -15,6 +16,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  // Form key for validation, and controllers to grab text from fields
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -26,6 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  // Trigger login via AuthProvider if form inputs are valid
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -36,6 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
         if (mounted) {
           Helpers.showSnackBar(context, 'Successfully signed in!');
+          // Go to home feed screen and remove login screen from stack
           Navigator.pushReplacementNamed(context, AppRoutes.home);
         }
       } catch (e) {
@@ -65,7 +69,8 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 40),
-                // Heading
+                
+                // Welcome header text
                 Text(
                   'Welcome Back!',
                   style: theme.textTheme.headlineMedium?.copyWith(
@@ -83,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 36),
 
-                // Form Fields
+                // Text fields for user input
                 CustomTextField(
                   controller: _emailController,
                   hintText: 'Enter your student email',
@@ -104,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   enabled: !authProvider.isLoading,
                 ),
 
-                // Forgot Password Link
+                // Button to recover password if they forgot it
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
@@ -122,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Submit Button
+                // Login trigger button
                 CustomButton(
                   text: 'Sign In',
                   onPressed: _handleLogin,
@@ -130,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // Register Link
+                // Navigates to registration page
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

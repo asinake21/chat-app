@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// Reusable widget to show a user's avatar. If there's no photoUrl, we show a default person icon instead.
 class UserAvatar extends StatelessWidget {
   final String photoUrl;
   final double radius;
@@ -12,6 +13,7 @@ class UserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // If the photo URL is empty, show a person icon placeholder
     if (photoUrl.isEmpty) {
       return CircleAvatar(
         radius: radius,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+// A custom reusable button widget that can be filled or outlined.
+// It also has a built-in loading indicator so we don't have to write it every time we submit a form.
 class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;

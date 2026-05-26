@@ -10,6 +10,7 @@ import '../../screens/profile/profile_screen.dart';
 import '../../screens/notifications/notification_screen.dart';
 import '../../screens/settings/settings_screen.dart';
 
+// This class holds all our route names so we don't make typos when navigating
 class AppRoutes {
   AppRoutes._();
 

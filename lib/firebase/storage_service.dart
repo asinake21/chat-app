@@ -1,10 +1,11 @@
 import 'package:image_picker/image_picker.dart';
 
 class StorageService {
-  // Firebase Storage has been disabled to support the free plan without upload failures.
+  // Firebase Storage is disabled for now to stay on the Firebase free plan and avoid upload errors.
+  // In the future, we can uncomment the FirebaseStorage code if we get a paid plan.
   // final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  /// Mock/Bypass upload: Returns null since image posting is disabled
+  // We don't upload images for posts anymore, so this just returns null.
   Future<String?> uploadPostImage({
     required XFile imageFile,
     required String userId,
@@ -12,7 +13,8 @@ class StorageService {
     return null;
   }
 
-  /// Mock/Bypass upload: Returns a static default profile image URL to avoid Storage usage
+  // Returns a static Unsplash placeholder image instead of uploading to Firebase Storage.
+  // This keeps the profile screen working with a default picture.
   Future<String?> uploadProfileImage({
     required XFile imageFile,
     required String userId,

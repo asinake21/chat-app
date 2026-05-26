@@ -3,34 +3,36 @@ import 'firestore_service.dart';
 import '../models/user_model.dart';
 import '../core/constants/app_constants.dart';
 
+// This service handles all Firebase Authentication actions like signing in, signing up, and resetting password.
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirestoreService _firestoreService = FirestoreService();
 
-  // Get current Firebase user
+  // Get the currently logged-in user
   User? get currentUser => _auth.currentUser;
 
-  // Stream of auth changes
+  // Stream that tells us if the user's auth state changed (like logged in or out)
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  /// Sign up user with Email, Password and Display Name
+  // Signs up a new user and sets up their Firestore profile
+  // TODO: Add email verification step if we have time before submission
   Future<UserCredential> signUpWithEmailAndPassword({
     required String email,
     required String password,
     required String displayName,
   }) async {
     try {
-      // 1. Create User in Firebase Authentication
+      // 1. Create the credentials in Firebase Auth
       final credential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      // 2. Set Firebase User Display Name
+      // 2. Set their display name on the Firebase user profile
       await credential.user?.updateDisplayName(displayName);
       await credential.user?.reload();
 
-      // 3. Create User Document in Cloud Firestore
+      // 3. Save additional user info to Firestore so we can show profiles
       if (credential.user != null) {
         final userModel = UserModel(
           uid: credential.user!.uid,
@@ -51,7 +53,7 @@ class AuthService {
     }
   }
 
-  /// Sign in user with Email and Password
+  // Logs in an existing user with email and password
   Future<UserCredential> signInWithEmailAndPassword({
     required String email,
     required String password,
@@ -68,7 +70,7 @@ class AuthService {
     }
   }
 
-  /// Sign out current user
+  // Signs out the user
   Future<void> signOut() async {
     try {
       await _auth.signOut();
@@ -77,7 +79,7 @@ class AuthService {
     }
   }
 
-  /// Send password reset link to user's email
+  // Sends a password reset email
   Future<void> resetPassword(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);

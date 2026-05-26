@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 class Helpers {
   Helpers._();
 
+  // Helper function to show a quick message (snackbar) at the bottom of the screen
   static void showSnackBar(BuildContext context, String message, {bool isError = false}) {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -24,10 +25,12 @@ class Helpers {
     );
   }
 
+  // Format date to a readable string like "May 26, 2026 • 11:30 AM"
   static String formatDate(DateTime dateTime) {
     return DateFormat('MMM d, yyyy • h:mm a').format(dateTime);
   }
 
+  // Convert a timestamp to a "time ago" string (e.g., "5m ago", "2h ago")
   static String timeAgo(DateTime dateTime) {
     final difference = DateTime.now().difference(dateTime);
 

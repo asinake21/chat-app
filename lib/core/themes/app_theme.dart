@@ -4,21 +4,22 @@ import 'package:google_fonts/google_fonts.dart';
 class AppTheme {
   AppTheme._();
 
-  // Premium Indigo / Royal Blue scheme for light mode
-  static const Color lightPrimary = Color(0xFF4F46E5); // Indigo-600
+  // Colors for our light theme (using Indigo/Sky blue)
+  static const Color lightPrimary = Color(0xFF4F46E5); 
   static const Color lightOnPrimary = Colors.white;
-  static const Color lightSecondary = Color(0xFF0EA5E9); // Sky-500
-  static const Color lightBackground = Color(0xFFF8FAFC); // Slate-50
+  static const Color lightSecondary = Color(0xFF0EA5E9); 
+  static const Color lightBackground = Color(0xFFF8FAFC); 
   static const Color lightSurface = Colors.white;
-  static const Color lightError = Color(0xFFEF4444); // Red-500
+  static const Color lightError = Color(0xFFEF4444); 
 
-  // Modern Dark Mode scheme (Deep slate/indigo)
-  static const Color darkPrimary = Color(0xFF6366F1); // Indigo-500
+  // Colors for our dark theme (deep slate colors so it looks modern)
+  // TODO: Add more theme options like a true black amoled mode later
+  static const Color darkPrimary = Color(0xFF6366F1); 
   static const Color darkOnPrimary = Colors.white;
-  static const Color darkSecondary = Color(0xFF38BDF8); // Sky-400
-  static const Color darkBackground = Color(0xFF0F172A); // Slate-900
-  static const Color darkSurface = Color(0xFF1E293B); // Slate-800
-  static const Color darkError = Color(0xFFF87171); // Red-400
+  static const Color darkSecondary = Color(0xFF38BDF8); 
+  static const Color darkBackground = Color(0xFF0F172A); 
+  static const Color darkSurface = Color(0xFF1E293B); 
+  static const Color darkError = Color(0xFFF87171);
 
   static ThemeData get lightTheme {
     return ThemeData(

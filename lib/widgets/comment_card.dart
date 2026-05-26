@@ -3,6 +3,8 @@ import '../models/comment_model.dart';
 import '../core/utils/helpers.dart';
 import 'user_avatar.dart';
 
+// Widget to display a comment card in the post details screen.
+// It has a bubble layout similar to chat applications.
 class CommentCard extends StatelessWidget {
   final CommentModel comment;
 

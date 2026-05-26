@@ -9,10 +9,10 @@ class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   // ==========================================
-  // USER OPERATIONS
+  // USER PROFILE METHODS
   // ==========================================
 
-  /// Save new user profile to Firestore
+  // Saves a new user's profile information to the users collection
   Future<void> createUser(UserModel user) async {
     await _db
         .collection(AppConstants.usersCollection)
@@ -20,7 +20,7 @@ class FirestoreService {
         .set(user.toMap());
   }
 
-  /// Fetch user profile details
+  // Helper to fetch a user profile from Firestore using their unique ID
   Future<UserModel?> getUser(String uid) async {
     final doc = await _db.collection(AppConstants.usersCollection).doc(uid).get();
     if (doc.exists && doc.data() != null) {
@@ -29,7 +29,8 @@ class FirestoreService {
     return null;
   }
 
-  /// Update user profile details
+  // Updates profile info. If displayName or photoUrl changes, we also update
+  // the copies stored in their posts so they don't show old info.
   Future<void> updateUserProfile(
     String uid, {
     String? displayName,
@@ -46,7 +47,7 @@ class FirestoreService {
     if (data.isNotEmpty) {
       await _db.collection(AppConstants.usersCollection).doc(uid).update(data);
 
-      // Denormalize author information in posts where this user is the author
+      // If user changed their name or photo, update all their posts as well
       if (displayName != null || photoUrl != null) {
         final postsQuery = await _db
             .collection(AppConstants.postsCollection)
@@ -66,15 +67,15 @@ class FirestoreService {
   }
 
   // ==========================================
-  // POST OPERATIONS
+  // POST METHODS
   // ==========================================
 
-  /// Create a new post
+  // Adds a new post to the database
   Future<void> createPost(PostModel post) async {
     await _db.collection(AppConstants.postsCollection).add(post.toMap());
   }
 
-  /// Update a post content or image
+  // Updates the post content or its image URL
   Future<void> updatePost(String postId, {required String content, String? imageUrl}) async {
     final Map<String, dynamic> data = {'content': content};
     if (imageUrl != null) data['imageUrl'] = imageUrl;
@@ -82,14 +83,14 @@ class FirestoreService {
     await _db.collection(AppConstants.postsCollection).doc(postId).update(data);
   }
 
-  /// Delete a post, its comments and image references
+  // Deletes a post and uses a batch to delete all comments associated with it
   Future<void> deletePost(String postId) async {
     final postRef = _db.collection(AppConstants.postsCollection).doc(postId);
 
-    // Run in batch to clean up associated comments
     final batch = _db.batch();
     batch.delete(postRef);
 
+    // Find and delete all comments on this post too
     final commentsQuery = await _db
         .collection(AppConstants.commentsCollection)
         .where('postId', isEqualTo: postId)
@@ -102,7 +103,8 @@ class FirestoreService {
     await batch.commit();
   }
 
-  /// Get stream of all posts, ordered by creation date
+  // Streams all posts sorted by creation date (newest first) for the main feed
+  // TODO: Add pagination later if we start having too many posts
   Stream<List<PostModel>> getPostsStream() {
     return _db
         .collection(AppConstants.postsCollection)
@@ -113,7 +115,7 @@ class FirestoreService {
             .toList());
   }
 
-  /// Get stream of posts created by a specific user
+  // Streams posts written by a specific user (for their profile page)
   Stream<List<PostModel>> getUserPostsStream(String uid) {
     return _db
         .collection(AppConstants.postsCollection)
@@ -125,7 +127,7 @@ class FirestoreService {
           ..sort((a, b) => b.createdAt.compareTo(a.createdAt)));
   }
 
-  /// Toggle post likes (Add or Remove user ID from likes list)
+  // Likes or unlikes a post. Also sends a notification if someone else liked your post.
   Future<void> toggleLikePost(String postId, String userId, UserModel currentPoster) async {
     final postRef = _db.collection(AppConstants.postsCollection).doc(postId);
     final postDoc = await postRef.get();
@@ -136,15 +138,17 @@ class FirestoreService {
     final isLiked = post.likes.contains(userId);
 
     if (isLiked) {
+      // Unlike the post
       await postRef.update({
         'likes': FieldValue.arrayRemove([userId])
       });
     } else {
+      // Like the post
       await postRef.update({
         'likes': FieldValue.arrayUnion([userId])
       });
 
-      // Send activity notification if it's not the user liking their own post
+      // Notify the post owner (only if it's someone else liking it)
       if (post.authorId != userId) {
         final notif = NotificationModel(
           id: '',
@@ -163,24 +167,24 @@ class FirestoreService {
   }
 
   // ==========================================
-  // COMMENT OPERATIONS
+  // COMMENT METHODS
   // ==========================================
 
-  /// Add a comment to a post and update comment count atomically
+  // Saves a comment and increments the commentsCount on the post document
   Future<void> addComment(CommentModel comment, String postAuthorId, UserModel currentPoster) async {
     final batch = _db.batch();
 
-    // 1. Add comment to subcollection/collection
+    // 1. Create the comment document
     final commentRef = _db.collection(AppConstants.commentsCollection).doc();
     batch.set(commentRef, comment.toMap());
 
-    // 2. Increment comment counter in Post document
+    // 2. Increment the comment counter on the main post
     final postRef = _db.collection(AppConstants.postsCollection).doc(comment.postId);
     batch.update(postRef, {'commentsCount': FieldValue.increment(1)});
 
     await batch.commit();
 
-    // 3. Create activity notification (excluding self-comments)
+    // 3. Notify the post author about the comment
     if (postAuthorId != comment.authorId) {
       final notif = NotificationModel(
         id: '',
@@ -197,7 +201,7 @@ class FirestoreService {
     }
   }
 
-  /// Get stream of comments for a specific post
+  // Streams all comments on a post, sorted by oldest first (chronological order)
   Stream<List<CommentModel>> getCommentsStream(String postId) {
     return _db
         .collection(AppConstants.commentsCollection)
@@ -210,17 +214,17 @@ class FirestoreService {
   }
 
   // ==========================================
-  // NOTIFICATION OPERATIONS
+  // NOTIFICATION METHODS
   // ==========================================
 
-  /// Save notification document to Firestore
+  // Saves a new activity notification
   Future<void> createNotification(NotificationModel notification) async {
     await _db
         .collection(AppConstants.notificationsCollection)
         .add(notification.toMap());
   }
 
-  /// Get stream of active notifications for a user
+  // Streams notifications received by a user, newest first
   Stream<List<NotificationModel>> getNotificationsStream(String receiverId) {
     return _db
         .collection(AppConstants.notificationsCollection)
@@ -232,7 +236,7 @@ class FirestoreService {
           ..sort((a, b) => b.createdAt.compareTo(a.createdAt)));
   }
 
-  /// Mark single notification as read
+  // Marks a notification as read when user views their notifications screen
   Future<void> markNotificationAsRead(String notificationId) async {
     await _db
         .collection(AppConstants.notificationsCollection)

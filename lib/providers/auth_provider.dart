@@ -25,24 +25,28 @@ class AuthProvider extends ChangeNotifier {
     _init();
   }
 
-  /// Listens to authentication state changes and loads profile when user is signed in
+  // Initialize the provider by listening to Firebase Auth changes
   void _init() {
     _authService.authStateChanges.listen((User? firebaseUser) async {
       if (firebaseUser != null) {
+        // If logged in, fetch their profile details from Firestore
         await fetchUserProfile(firebaseUser.uid);
-        // Initialize push notifications for the authenticated user
+        // Also register this device to receive push notifications
         _notificationService.initializeNotification(firebaseUser.uid);
       } else {
+        // Clear user model on sign out
         _userModel = null;
         notifyListeners();
       }
     });
   }
 
-  /// Fetches the profile data from Cloud Firestore
+  // Load the user's Firestore profile data
+  // TODO: Add offline caching using SharedPreferences so the profile loads instantly
   Future<void> fetchUserProfile(String uid) async {
     try {
       _userModel = await _firestoreService.getUser(uid);
+      // Fallback: If document doesn't exist yet (e.g. Google login or auth mismatch)
       if (_userModel == null && !_isSigningUp) {
         final firebaseUser = _authService.currentUser;
         if (firebaseUser != null) {
@@ -59,16 +63,17 @@ class AuthProvider extends ChangeNotifier {
       }
       notifyListeners();
     } catch (e) {
-      // Handle error or print
+      debugPrint('Error fetching user profile: $e');
     }
   }
 
+  // Helper to toggle the loading state and rebuild the UI
   void _setLoading(bool value) {
     _isLoading = value;
     notifyListeners();
   }
 
-  /// Signs up a new user and signs them in
+  // Register a new student user
   Future<void> signUp(String email, String password, String displayName) async {
     _setLoading(true);
     _isSigningUp = true;
@@ -88,7 +93,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Signs in an existing user
+  // Log in user with email & password
   Future<void> signIn(String email, String password) async {
     _setLoading(true);
     try {
@@ -101,7 +106,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Signs out the current user
+  // Sign out the current user and clean up local user state
   Future<void> signOut() async {
     _setLoading(true);
     try {
@@ -112,7 +117,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Triggers a password reset email
+  // Send a reset password email to the user
   Future<void> resetPassword(String email) async {
     _setLoading(true);
     try {
@@ -122,7 +127,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Updates profile metadata
+  // Update displayName or bio, then refresh the local user model
   Future<void> updateProfile({
     String? displayName,
     String? bio,
@@ -136,7 +141,7 @@ class AuthProvider extends ChangeNotifier {
         bio: bio,
       );
 
-      // Refresh the locally stored model
+      // Re-fetch profile to update UI with new details
       await fetchUserProfile(_userModel!.uid);
     } finally {
       _setLoading(false);

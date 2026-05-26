@@ -3,27 +3,28 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
-// Providers
+// Providers for managing state
 import 'providers/auth_provider.dart';
 import 'providers/post_provider.dart';
 import 'providers/comment_provider.dart';
 import 'providers/theme_provider.dart';
 
-// Themes & Routes
+// Styling and routing setups
 import 'core/themes/app_theme.dart';
 import 'core/routes/app_routes.dart';
 
+// Start the app! We initialize widgets and configure Firebase first
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase with fallback try-catch to allow local app compiling
-  // without immediate crashes if options are still using placeholders
+  // Try to initialize Firebase. Catch block is here so the app won't crash 
+  // immediately if config is missing during local testing.
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
   } catch (e) {
-    debugPrint('Firebase initialization error: $e');
+    debugPrint('Firebase initialization failed: $e');
   }
 
   runApp(

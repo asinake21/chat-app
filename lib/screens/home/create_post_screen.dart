@@ -5,6 +5,7 @@ import '../../providers/post_provider.dart';
 import '../../widgets/custom_button.dart';
 import '../../core/utils/helpers.dart';
 
+// Screen to write and publish a new post
 class CreatePostScreen extends StatefulWidget {
   const CreatePostScreen({Key? key}) : super(key: key);
 
@@ -13,6 +14,7 @@ class CreatePostScreen extends StatefulWidget {
 }
 
 class _CreatePostScreenState extends State<CreatePostScreen> {
+  // Controller to get text input for the post content
   final _textController = TextEditingController();
 
   @override
@@ -21,6 +23,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     super.dispose();
   }
 
+  // Validates text input and saves the new post using PostProvider
   Future<void> _submitPost() async {
     final content = _textController.text.trim();
     if (content.isEmpty) {
@@ -44,6 +47,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       );
       if (mounted) {
         Helpers.showSnackBar(context, 'Post shared successfully!');
+        // Close screen and return to feed
         Navigator.pop(context);
       }
     } catch (e) {
@@ -66,6 +70,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       appBar: AppBar(
         title: const Text('New Post'),
         actions: [
+          // Share button in appbar
           TextButton(
             onPressed: postProvider.isLoading ? null : _submitPost,
             child: postProvider.isLoading
@@ -90,7 +95,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Text Composer Area
+            // Multi-line text field for typing the post content
             TextField(
               controller: _textController,
               maxLines: 6,
@@ -118,7 +123,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Share Button
+            // Main share button at the bottom of the form
             CustomButton(
               text: 'Share Post',
               onPressed: _submitPost,

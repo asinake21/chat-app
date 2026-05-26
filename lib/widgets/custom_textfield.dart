@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+// A styled custom text field wrapper around TextFormField.
+// It handles showing/hiding password text automatically when isPassword is true.
 class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
   final String hintText;
@@ -29,6 +31,7 @@ class CustomTextField extends StatefulWidget {
 }
 
 class _CustomTextFieldState extends State<CustomTextField> {
+  // Keeps track of whether password is hidden or visible
   bool _obscureText = true;
 
   @override

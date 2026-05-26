@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// Reusable loading spinner widget that can optionally take a full screen or show a text message below the indicator.
 class LoadingWidget extends StatelessWidget {
   final String? message;
   final bool isFullScreen;

@@ -5,10 +5,10 @@ class NotificationService {
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
   final FirestoreService _firestoreService = FirestoreService();
 
-  /// Requests messaging permissions and registers the FCM token to Firestore
+  // Asks the user for push notification permissions and saves their device token
   Future<void> initializeNotification(String userId) async {
     try {
-      // 1. Request permissions for iOS/Android 13+
+      // 1. Request notifications permission (important for iOS and Android 13+)
       NotificationSettings settings = await _fcm.requestPermission(
         alert: true,
         badge: true,
@@ -17,37 +17,36 @@ class NotificationService {
       );
 
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-        // 2. Fetch unique Device Token
+        // 2. Get the unique FCM token for this device
         String? token = await _fcm.getToken();
         if (token != null) {
           await _firestoreService.updateUserProfile(userId, fcmToken: token);
         }
 
-        // 3. Listen for token refreshes
+        // 3. Listen in case the token gets refreshed later
         _fcm.onTokenRefresh.listen((newToken) async {
           await _firestoreService.updateUserProfile(userId, fcmToken: newToken);
         });
 
-        // 4. Configure notification listeners
+        // 4. Setup listeners to handle incoming notifications
         _setupNotificationListeners();
       }
     } catch (e) {
-      // Gracefully handle FCM errors (e.g. running on simulators with no services)
-      // print('FCM Initialization failed: $e');
+      // We catch errors here because FCM might fail on some simulators/emulators
     }
   }
 
-  /// Sets up message listeners for active foreground sessions
+  // Set up listeners for background and foreground notifications
+  // TODO: Install flutter_local_notifications to show real heads-up banners when app is active
   void _setupNotificationListeners() {
-    // Handled when application is running in foreground
+    // When the app is open and in the foreground
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      // We can trigger a local notification here if desired
-      // E.g., showing a dialog or standard alert banner
+      // For now, we don't show a popup since the user is already inside the app
     });
 
-    // Handled when app is opened from a background state by tapping notification
+    // When the user clicks on a notification from their drawer
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      // Perform routing logic based on notification payload contents
+      // In the future we can parse message.data and navigate to the post
     });
   }
 }

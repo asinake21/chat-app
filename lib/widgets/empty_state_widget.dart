@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+// A widget to display when there is no data to show (e.g., "No posts yet" or "No comments yet").
+// It has a clean icon, title, description, and an optional button to try again/refresh.
 class EmptyStateWidget extends StatelessWidget {
   final IconData icon;
   final String title;

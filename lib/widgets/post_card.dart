@@ -7,6 +7,7 @@ import '../core/utils/helpers.dart';
 import '../core/routes/app_routes.dart';
 import 'user_avatar.dart';
 
+// Widget for displaying post cards in the main feeds and profile list
 class PostCard extends StatelessWidget {
   final PostModel post;
 
@@ -41,7 +42,7 @@ class PostCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header: Author Avatar, Name & Metadata
+              // Header: Show user profile, username, and time ago
               Row(
                 children: [
                   UserAvatar(
@@ -121,13 +122,13 @@ class PostCard extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
-              // Content Body Text
+              // Body: The text content of the post
               Text(
                 post.content,
                 style: const TextStyle(fontSize: 15, height: 1.4),
               ),
 
-              // Image Attachment
+              // Image Attachment: Show the image if the post has one (legacy posts)
               if (post.imageUrl != null) ...[
                 const SizedBox(height: 12),
                 ClipRRect(
@@ -163,7 +164,7 @@ class PostCard extends StatelessWidget {
               const Divider(height: 1),
               const SizedBox(height: 8),
 
-              // Footer: Likes & Comments counts and buttons
+              // Footer: Like and Comment count buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
